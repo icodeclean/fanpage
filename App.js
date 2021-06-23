@@ -1,80 +1,58 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
  * @format
  * @flow strict-local
  */
 
-import React from 'react';
-import type {Node} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import 'react-native-gesture-handler';
+import * as React from 'react';
 
-import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import Login from './components/login';
+import Registration from './components/registration';
+import HomePage from './components/homepage';
 
-const Section = ({children, title}): Node => {
+const Page = createStackNavigator();
+
+const Pages = () => {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <Page.Navigator
+      initialRouteName="Registration"
+      screenOptions={{
+        headerTitleAlign: 'center',
+        headerStyle: {
+          backgroundColor: '#00b74f',
+        },
+        headerTintColor: '#ffffff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}>
+      <Page.Screen
+        name="Registration"
+        component={Registration}
+        options={{title: 'Registration'}}
+      />
+      <Page.Screen
+        name="Login"
+        component={Login}
+        options={({title: 'Login'}, {headerLeft: null})}
+      />
+      <Page.Screen
+        name="Home Page"
+        component={HomePage}
+        options={({title: 'HomePage'}, {headerLeft: null})}
+      />
+    </Page.Navigator>
   );
 };
 
-const App: () => Node = () => {
+const App = () => {
   return (
-    <SafeAreaView>
-      <StatusBar barStyle="dark-content" />
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <View>
-          <Section title="My App">My app</Section>
-          <Section title="My App">My app</Section>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Pages />
+    </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
