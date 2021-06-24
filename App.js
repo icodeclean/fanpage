@@ -11,6 +11,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Login from './components/login';
 import Registration from './components/registration';
 import HomePage from './components/homepage';
+import auth from '@react-native-firebase/auth';
+
 
 const Page = createStackNavigator();
 

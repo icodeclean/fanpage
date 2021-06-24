@@ -25,7 +25,7 @@ export default class HomePage extends Component {
     };
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>Greetings, {this.state.firstName}</Text>
+        <Text style={styles.text}>Greetings, {this.state.uid}</Text>
 
         <Button color="#00b74f" title="Log off" onPress={() => this.logOff()} />
       </View>

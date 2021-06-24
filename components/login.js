@@ -29,7 +29,7 @@ export default class Login extends Component {
   };
 
   userLogin = () => {
-    if (this.state.email === '' && this.state.password === '') {
+    if (this.state.email === '' || this.state.password === '') {
       Alert.alert('Enter login details to login!');
     } else {
       this.setState({

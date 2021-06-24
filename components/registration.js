@@ -14,6 +14,7 @@ export default class Registration extends Component {
   constructor() {
     super();
     this.state = {
+      displayName: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -29,8 +30,13 @@ export default class Registration extends Component {
   };
 
   registerUser = () => {
-    if (this.state.email === '' && this.state.password === '') {
-      Alert.alert('Enter details to signup!');
+    if (
+      this.state.email === '' ||
+      this.state.password === '' ||
+      this.state.lastName === '' ||
+      this.state.firstName === ''
+    ) {
+      Alert.alert('Enter all details to register!');
     } else {
       this.setState({
         isLoading: true,
@@ -38,13 +44,12 @@ export default class Registration extends Component {
       auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(res => {
-          res.user.updateProfile({
-            firstName: this.state.firstName,
-          });
           console.log('User registered successfully!');
           this.setState({
             isLoading: false,
+            displayName: '',
             firstName: '',
+            lastName: '',
             email: '',
             password: '',
           });
