@@ -9,6 +9,7 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -23,6 +24,7 @@ export default class HomePage extends Component {
       modalVisible: false,
       message: '',
       isLoading: false,
+      userList: ['hello'],
     };
   }
 
@@ -46,6 +48,13 @@ export default class HomePage extends Component {
           });
         }
       });
+    this.unsubscribe = firestore()
+      .collection('posts')
+      .onSnapshot(this.getMessages);
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   logOff = () => {
@@ -82,6 +91,20 @@ export default class HomePage extends Component {
     }
   };
 
+  getMessages = querySnapshot => {
+    const userList = [];
+    querySnapshot.forEach(res => {
+      const {message, date} = res._data;
+      console.log({message, date});
+      userList.push({message, date});
+    });
+    userList.sort((obj1, obj2) => obj1.date.seconds - obj2.date.seconds);
+    this.setState({
+      userList,
+      isLoading: false,
+    });
+  };
+
   render() {
     if (this.state.isLoading) {
       return (
@@ -91,52 +114,67 @@ export default class HomePage extends Component {
       );
     }
     return (
-      <View style={styles.container}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={this.state.modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            this.setState({modalVisible: !this.state.modalVisible});
-          }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <TextInput
-                style={styles.inputStyle}
-                placeholder="Enter your message..."
-                value={this.state.email}
-                onChangeText={value => this.updateInput(value, 'message')}
-              />
-              <Pressable
-                style={[styles.button, styles.buttonSave]}
-                onPress={() => {
-                  this.saveMessage();
-                }}>
-                <Text style={styles.textStyle}>Save</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => {
-                  this.setState({modalVisible: !this.state.modalVisible});
-                }}>
-                <Text style={styles.textStyle}>Cancel</Text>
-              </Pressable>
+      <ScrollView style={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={this.state.modalVisible}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+              this.setState({modalVisible: !this.state.modalVisible});
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <TextInput
+                  style={styles.inputStyle}
+                  placeholder="Enter your message..."
+                  value={this.state.email}
+                  onChangeText={value => this.updateInput(value, 'message')}
+                />
+                <Pressable
+                  style={[styles.button, styles.buttonSave]}
+                  onPress={() => {
+                    this.saveMessage();
+                  }}>
+                  <Text style={styles.textStyle}>Save</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    this.setState({modalVisible: !this.state.modalVisible});
+                  }}>
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </Pressable>
+              </View>
             </View>
-          </View>
-        </Modal>
-        <Pressable
-          style={[styles.button, styles.buttonOpen]}
-          onPress={() => {
-            this.setState({modalVisible: true});
-          }}>
-          <Text style={styles.textStyle}>+</Text>
-        </Pressable>
+          </Modal>
+          <Pressable
+            style={[styles.button, styles.buttonOpen]}
+            onPress={() => {
+              this.setState({modalVisible: true});
+            }}>
+            <Text style={styles.textStyle}>+</Text>
+          </Pressable>
 
-        <Text style={styles.text}>Greetings, {this.state.user.firstName}</Text>
-
-        <Button color="#c71616" title="Log off" onPress={() => this.logOff()} />
-      </View>
+          <Text style={styles.text}>
+            Greetings, {this.state.user.firstName}
+          </Text>
+          {console.log(this.state.userList)}
+          {this.state.userList.map((item, i) => {
+            return (
+              <Text style={styles.messageStyle} key={i}>
+                {item.message}
+              </Text>
+            );
+          })}
+          <Button
+            color="#c71616"
+            title="Log off"
+            onPress={() => this.logOff()}
+          />
+        </View>
+      </ScrollView>
     );
   }
 }
@@ -147,7 +185,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 35,
+    padding: 15,
+    backgroundColor: '#ffffff',
+  },
+  scrollContainer: {
+    flex: 1,
+    display: 'flex',
+    padding: 0,
     backgroundColor: '#ffffff',
   },
   text: {
@@ -188,6 +232,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  messageStyle: {
+    color: 'gray',
+    fontWeight: 'bold',
+    marginBottom: 15,
   },
   modalText: {
     marginBottom: 15,
