@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 export default class Registration extends Component {
   constructor() {
@@ -44,6 +45,18 @@ export default class Registration extends Component {
       auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
         .then(res => {
+          firestore()
+            .collection('users')
+            .doc(res.user.uid)
+            .set({
+              firstName: this.state.firstName,
+              lastName: this.state.lastName,
+              email: this.state.email,
+              password: this.state.password,
+              date: firestore.Timestamp.fromDate(new Date()),
+              type: 'customer',
+            })
+            .then(response => console.log('saved properties'));
           console.log('User registered successfully!');
           this.setState({
             isLoading: false,

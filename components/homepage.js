@@ -1,12 +1,32 @@
 import React, {Component} from 'react';
 import {StyleSheet, View, Text, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
 export default class HomePage extends Component {
   constructor() {
     super();
     this.state = {
-      uid: '',
+      uid: auth().currentUser.uid,
+      user: {},
+      type: '',
     };
+  }
+
+  componentDidMount() {
+    firestore()
+      .collection('users')
+      .doc(this.state.uid)
+      .get()
+      .then(response => {
+        if (response.exists) {
+          const user = response._data;
+          console.log(user);
+          this.setState({
+            user: user,
+          });
+        }
+      });
   }
 
   logOff = () => {
@@ -19,15 +39,12 @@ export default class HomePage extends Component {
   };
 
   render() {
-    this.state = {
-      firstName: auth().currentUser.firstName,
-      uid: auth().currentUser.uid,
-    };
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>Greetings, {this.state.uid}</Text>
+        <Button color="#00b74f" title="+" onPress={() => this.logOff()} />
+        <Text style={styles.text}>Greetings, {this.state.user.firstName}</Text>
 
-        <Button color="#00b74f" title="Log off" onPress={() => this.logOff()} />
+        <Button color="#c71616" title="Log off" onPress={() => this.logOff()} />
       </View>
     );
   }
