@@ -1,5 +1,15 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Text, Button} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  Pressable,
+  Alert,
+  Modal,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
@@ -10,8 +20,17 @@ export default class HomePage extends Component {
       uid: auth().currentUser.uid,
       user: {},
       type: '',
+      modalVisible: false,
+      message: '',
+      isLoading: false,
     };
   }
+
+  updateInput = (value, prop) => {
+    const state = this.state;
+    state[prop] = value;
+    this.setState(state);
+  };
 
   componentDidMount() {
     firestore()
@@ -38,10 +57,82 @@ export default class HomePage extends Component {
       .catch(error => this.setState({errorMessage: error.message}));
   };
 
+  saveMessage = () => {
+    if (this.state.message === '') {
+      Alert.alert('Please enter a message');
+    } else {
+      this.setState({
+        isLoading: true,
+      });
+      firestore()
+        .collection('posts')
+        .doc()
+        .set({
+          message: this.state.message,
+          date: firestore.Timestamp.fromDate(new Date()),
+        })
+        .then(response => {
+          console.log('Message Saved!');
+          this.setState({
+            isLoading: false,
+            message: '',
+            modalVisible: !this.state.modalVisible,
+          });
+        });
+    }
+  };
+
   render() {
+    if (this.state.isLoading) {
+      return (
+        <View style={styles.preloader}>
+          <ActivityIndicator size="large" color="#9E9E9E" />
+        </View>
+      );
+    }
     return (
       <View style={styles.container}>
-        <Button color="#00b74f" title="+" onPress={() => this.logOff()} />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            this.setState({modalVisible: !this.state.modalVisible});
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <TextInput
+                style={styles.inputStyle}
+                placeholder="Enter your message..."
+                value={this.state.email}
+                onChangeText={value => this.updateInput(value, 'message')}
+              />
+              <Pressable
+                style={[styles.button, styles.buttonSave]}
+                onPress={() => {
+                  this.saveMessage();
+                }}>
+                <Text style={styles.textStyle}>Save</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => {
+                  this.setState({modalVisible: !this.state.modalVisible});
+                }}>
+                <Text style={styles.textStyle}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+        <Pressable
+          style={[styles.button, styles.buttonOpen]}
+          onPress={() => {
+            this.setState({modalVisible: true});
+          }}>
+          <Text style={styles.textStyle}>+</Text>
+        </Pressable>
+
         <Text style={styles.text}>Greetings, {this.state.user.firstName}</Text>
 
         <Button color="#c71616" title="Log off" onPress={() => this.logOff()} />
@@ -62,5 +153,62 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 15,
     marginBottom: 20,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    margin: 5,
+  },
+  buttonOpen: {
+    backgroundColor: '#00b74f',
+  },
+  buttonClose: {
+    backgroundColor: '#c71616',
+  },
+  buttonSave: {
+    backgroundColor: '#00b74f',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  inputStyle: {
+    width: '100%',
+    marginBottom: 15,
+    paddingBottom: 15,
+    alignSelf: 'center',
+    borderColor: '#cccccc',
+    borderBottomWidth: 2,
+  },
+  preloader: {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
   },
 });
