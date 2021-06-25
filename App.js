@@ -11,8 +11,8 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Login from './components/login';
 import Registration from './components/registration';
 import HomePage from './components/homepage';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import auth from '@react-native-firebase/auth';
-
 
 const Page = createStackNavigator();
 
@@ -51,9 +51,11 @@ const Pages = () => {
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Pages />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Pages />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 

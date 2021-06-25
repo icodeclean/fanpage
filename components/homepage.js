@@ -21,10 +21,11 @@ export default class HomePage extends Component {
       uid: auth().currentUser.uid,
       user: {},
       type: '',
-      modalVisible: false,
+      messageModalVisible: false,
+      logOffModalVisible: false,
       message: '',
       isLoading: false,
-      userList: ['hello'],
+      userList: [],
     };
   }
 
@@ -42,7 +43,6 @@ export default class HomePage extends Component {
       .then(response => {
         if (response.exists) {
           const user = response._data;
-          console.log(user);
           this.setState({
             user: user,
           });
@@ -61,6 +61,7 @@ export default class HomePage extends Component {
     auth()
       .signOut()
       .then(() => {
+        this.setState({messageModalVisible: false});
         this.props.navigation.navigate('Login');
       })
       .catch(error => this.setState({errorMessage: error.message}));
@@ -85,7 +86,7 @@ export default class HomePage extends Component {
           this.setState({
             isLoading: false,
             message: '',
-            modalVisible: !this.state.modalVisible,
+            messageModalVisible: false,
           });
         });
     }
@@ -95,7 +96,6 @@ export default class HomePage extends Component {
     const userList = [];
     querySnapshot.forEach(res => {
       const {message, date} = res._data;
-      console.log({message, date});
       userList.push({message, date});
     });
     userList.sort((obj1, obj2) => obj1.date.seconds - obj2.date.seconds);
@@ -119,10 +119,10 @@ export default class HomePage extends Component {
           <Modal
             animationType="slide"
             transparent={true}
-            visible={this.state.modalVisible}
+            visible={this.state.messageModalVisible}
             onRequestClose={() => {
               Alert.alert('Modal has been closed.');
-              this.setState({modalVisible: !this.state.modalVisible});
+              this.setState({messageModalVisible: false});
             }}>
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
@@ -142,36 +142,69 @@ export default class HomePage extends Component {
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
-                    this.setState({modalVisible: !this.state.modalVisible});
+                    this.setState({messageModalVisible: false});
                   }}>
                   <Text style={styles.textStyle}>Cancel</Text>
                 </Pressable>
               </View>
             </View>
           </Modal>
-          <Pressable
-            style={[styles.button, styles.buttonOpen]}
-            onPress={() => {
-              this.setState({modalVisible: true});
+          {this.state.user.type === 'ADMIN' ? (
+            <Pressable
+              style={[styles.button, styles.buttonOpen]}
+              onPress={() => {
+                this.setState({messageModalVisible: true});
+              }}>
+              <Text style={styles.textStyle}>+</Text>
+            </Pressable>
+          ) : (
+            <Text />
+          )}
+
+<Modal
+            animationType="slide"
+            transparent={true}
+            visible={this.state.logOffModalVisible}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+              this.setState({logOffModalVisible: false});
             }}>
-            <Text style={styles.textStyle}>+</Text>
-          </Pressable>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.textStyle}>Are you sure you want to log out?</Text>
+                <Pressable
+                  style={[styles.button, styles.buttonSave]}
+                  onPress={() => {
+                    this.logOff();
+                  }}>
+                  <Text style={styles.textStyle}>Log Off</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    this.setState({logOffModalVisible: !this.state.logOffModalVisible});
+                  }}>
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+
 
           <Text style={styles.text}>
             Greetings, {this.state.user.firstName}
           </Text>
-          {console.log(this.state.userList)}
           {this.state.userList.map((item, i) => {
             return (
               <Text style={styles.messageStyle} key={i}>
-                {item.message}
+                {i + 1}. {item.message}
               </Text>
             );
           })}
           <Button
             color="#c71616"
             title="Log off"
-            onPress={() => this.logOff()}
+            onPress={() => this.setState({logOffModalVisible: true})}
           />
         </View>
       </ScrollView>

@@ -19,6 +19,7 @@ export default class Login extends Component {
       email: '',
       password: '',
       isLoading: false,
+      errorMessage: '',
     };
   }
 
@@ -47,7 +48,14 @@ export default class Login extends Component {
           });
           this.props.navigation.navigate('Home Page');
         })
-        .catch(error => this.setState({errorMessage: error.message}));
+        .catch(error => {
+          let errorMessage = error.message;
+          if (error.code === 'auth/invalid-email') {
+            errorMessage = 'That email address is invalid!';
+          }
+          console.log(error);
+          this.setState({isLoading: false, errorMessage: errorMessage});
+        });
     }
   };
 
@@ -61,6 +69,7 @@ export default class Login extends Component {
     }
     return (
       <View style={styles.container}>
+        <Text style={styles.errorText}>{this.state.errorMessage}</Text>
         <TextInput
           style={styles.inputStyle}
           placeholder="Email"
@@ -107,6 +116,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderColor: '#cccccc',
     borderBottomWidth: 2,
+  },
+  errorText: {
+    color: '#bf0000',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   loginText: {
     color: '#00b700',

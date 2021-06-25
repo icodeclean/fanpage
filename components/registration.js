@@ -21,6 +21,7 @@ export default class Registration extends Component {
       email: '',
       password: '',
       isLoading: false,
+      errorMessage: '',
     };
   }
 
@@ -68,7 +69,17 @@ export default class Registration extends Component {
           });
           this.props.navigation.navigate('Login');
         })
-        .catch(error => this.setState({errorMessage: error.message}));
+        .catch(error => {
+          let errorMessage = error.message;
+          if (error.code === 'auth/email-already-in-use') {
+            errorMessage = 'That email address is already in use!';
+          }
+          if (error.code === 'auth/invalid-email') {
+            errorMessage = 'That email address is invalid!';
+          }
+          console.log(error);
+          this.setState({isLoading: false, errorMessage: errorMessage});
+        });
     }
   };
 
@@ -82,6 +93,7 @@ export default class Registration extends Component {
     }
     return (
       <View style={styles.container}>
+        <Text style={styles.errorText}>{this.state.errorMessage}</Text>
         <TextInput
           style={styles.inputStyle}
           placeholder="First Name"
@@ -144,6 +156,11 @@ const styles = StyleSheet.create({
   loginText: {
     color: '#00b700',
     marginTop: 25,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: '#bf0000',
+    fontWeight: 'bold',
     textAlign: 'center',
   },
   preloader: {
