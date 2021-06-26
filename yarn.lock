@@ -5381,6 +5381,11 @@ react-is@^16.13.0, react-is@^16.7.0, react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-native-action-floating-button@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/react-native-action-floating-button/-/react-native-action-floating-button-1.0.7.tgz#8b27c905471ff5828cc8d18abb6dfb41c2f3210c"
+  integrity sha512-XJLYEosFThV37FM0C1lN/Y5MXUcGEBcJa74QP/kVY4JPT9kCIXxjUoXOUwYSvdyBUw2qjRA4qnEu+govNTM75A==
+
 react-native-codegen@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/react-native-codegen/-/react-native-codegen-0.0.6.tgz#b3173faa879cf71bfade8d030f9c4698388f6909"

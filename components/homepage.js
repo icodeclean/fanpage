@@ -13,6 +13,11 @@ import {
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import {
+  FloatingButton,
+  FloatingButtonChild,
+} from 'react-native-action-floating-button';
+import {Icon} from 'react-native-elements';
 
 export default class HomePage extends Component {
   constructor() {
@@ -114,100 +119,116 @@ export default class HomePage extends Component {
       );
     }
     return (
-      <ScrollView style={styles.scrollContainer}>
-        <View style={styles.container}>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={this.state.messageModalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              this.setState({messageModalVisible: false});
-            }}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <TextInput
-                  style={styles.inputStyle}
-                  placeholder="Enter your message..."
-                  value={this.state.email}
-                  onChangeText={value => this.updateInput(value, 'message')}
-                />
-                <Pressable
-                  style={[styles.button, styles.buttonSave]}
-                  onPress={() => {
-                    this.saveMessage();
-                  }}>
-                  <Text style={styles.textStyle}>Save</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={() => {
-                    this.setState({messageModalVisible: false});
-                  }}>
-                  <Text style={styles.textStyle}>Cancel</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Modal>
-          {this.state.user.type === 'ADMIN' ? (
-            <Pressable
-              style={[styles.button, styles.buttonOpen]}
-              onPress={() => {
-                this.setState({messageModalVisible: true});
+      <View style={styles.outerContainer}>
+        <ScrollView style={styles.scrollContainer}>
+          <View style={styles.container}>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={this.state.messageModalVisible}
+              onRequestClose={() => {
+                Alert.alert('Modal has been closed.');
+                this.setState({messageModalVisible: false});
               }}>
-              <Text style={styles.textStyle}>+</Text>
-            </Pressable>
-          ) : (
-            <Text />
-          )}
-
-<Modal
-            animationType="slide"
-            transparent={true}
-            visible={this.state.logOffModalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              this.setState({logOffModalVisible: false});
-            }}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <Text style={styles.textStyle}>Are you sure you want to log out?</Text>
-                <Pressable
-                  style={[styles.button, styles.buttonSave]}
-                  onPress={() => {
-                    this.logOff();
-                  }}>
-                  <Text style={styles.textStyle}>Log Off</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.button, styles.buttonClose]}
-                  onPress={() => {
-                    this.setState({logOffModalVisible: !this.state.logOffModalVisible});
-                  }}>
-                  <Text style={styles.textStyle}>Cancel</Text>
-                </Pressable>
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder="Enter your message..."
+                    value={this.state.email}
+                    onChangeText={value => this.updateInput(value, 'message')}
+                  />
+                  <Pressable
+                    style={[styles.button, styles.buttonSave]}
+                    onPress={() => {
+                      this.saveMessage();
+                    }}>
+                    <Text style={styles.textStyle}>Save</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => {
+                      this.setState({messageModalVisible: false});
+                    }}>
+                    <Text style={styles.textStyle}>Cancel</Text>
+                  </Pressable>
+                </View>
               </View>
-            </View>
-          </Modal>
+            </Modal>
 
-
-          <Text style={styles.text}>
-            Greetings, {this.state.user.firstName}
-          </Text>
-          {this.state.userList.map((item, i) => {
-            return (
-              <Text style={styles.messageStyle} key={i}>
-                {i + 1}. {item.message}
+            <Text style={styles.text}>
+              Greetings, {this.state.user.firstName}
+            </Text>
+            {this.state.userList.map((item, i) => {
+              return (
+                <Text style={styles.messageStyle} key={i}>
+                  {i + 1}. {item.message}
+                </Text>
+              );
+            })}
+            <Button
+              color="#c71616"
+              title="Log off"
+              onPress={() =>
+                this.setState({
+                  logOffModalVisible: true,
+                })
+              }
+            />
+            <Pressable
+              style={[styles.button, styles.buttonHide]}
+              onPress={() => {
+                this.setState({
+                  logOffModalVisible: true,
+                });
+              }}>
+              <Text style={styles.textStyle}>Cancel</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.logOffModalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            this.setState({logOffModalVisible: !logOffModalVisible});
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.textStyle}>
+                Are you sure you want to log out?
               </Text>
-            );
-          })}
-          <Button
-            color="#c71616"
-            title="Log off"
-            onPress={() => this.setState({logOffModalVisible: true})}
+              <Pressable
+                style={[styles.button, styles.buttonSave]}
+                onPress={() => {
+                  this.logOff();
+                }}>
+                <Text style={styles.textStyle}>Log Off</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => {
+                  this.setState({
+                    logOffModalVisible: false,
+                  });
+                }}>
+                <Text style={styles.textStyle}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+        {this.state.user.type === 'ADMIN' ? (
+          <FloatingButton
+            hasChildren={false}
+            icon={<Text style={styles.myIcon}>+</Text>}
+            backgroundColor="#00b74f"
+            onPress={() => this.setState({messageModalVisible: true})}
           />
-        </View>
-      </ScrollView>
+        ) : (
+          <Text />
+        )}
+      </View>
     );
   }
 }
@@ -220,6 +241,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     backgroundColor: '#ffffff',
+  },
+  outerContainer: {
+    flex: 1,
+    display: 'flex',
+  },
+  myIcon: {
+    fontWeight: 'bold',
+    fontSize: 25,
+    color: '#fff',
   },
   scrollContainer: {
     flex: 1,
@@ -257,6 +287,10 @@ const styles = StyleSheet.create({
   },
   buttonClose: {
     backgroundColor: '#c71616',
+  },
+  buttonHide: {
+    backgroundColor: '#fff',
+    shadowColor: '#fff',
   },
   buttonSave: {
     backgroundColor: '#00b74f',
